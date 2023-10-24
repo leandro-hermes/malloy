@@ -13,7 +13,7 @@ nix-shell --pure --keep NPM_TOKEN --keep PACKAGES --command "$(cat <<NIXCMD
   npm --no-audit --no-fund ci --loglevel error
   npm run build
   echo ----------- RUNNING POSTGRES TEST ---------------
-  npx jest '/Users/mtoy/msrc/malloy/test/src/databases/postgres/postgres.spec.ts'
+  npx jest /workspace/test/src/databases/postgres/postgres.spec.ts
   # echo Publishing \$PACKAGES
   # PRERELEASE=\$(date +%y%m%d%H%M%S)
   # VERSION=\$(jq -r .version ./lerna.json)-dev\$PRERELEASE
