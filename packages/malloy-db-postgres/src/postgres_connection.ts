@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /*
  * Copyright 2023 Google LLC
  *
@@ -271,8 +272,6 @@ export class PostgresConnection
       0,
       false
     );
-    // eslint-disable-next-line no-console
-    console.log(`SCHEMA FOR ${infoQuery}\n${this.p(result)}`);
     for (const row of result.rows) {
       const postgresDataType = row['data_type'] as string;
       let s = structDef;
@@ -338,6 +337,13 @@ export class PostgresConnection
     `;
 
     await this.schemaFromQuery(infoQuery, structDef);
+    if (structDef.fields.length === 0) {
+      console.log('NO ROWS FROM SCHEMA FETCH');
+      // maybe the table doesn't exist or is not accessible,
+      const existQuery = `SELECT count(*) FROM "${schema}"."${table}"`;
+      const countQuery = await this.runSQL(existQuery);
+      console.log(this.p(countQuery));
+    }
     return structDef;
   }
 
