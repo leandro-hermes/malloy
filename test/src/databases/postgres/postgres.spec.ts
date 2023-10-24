@@ -68,7 +68,7 @@ describe('Postgres tests', () => {
       {table_schema: 'public', table_name: 'UpperTablePublic'},
     ]);
     await expect(`
-      run: posgres.sql("""
+      run: postgres.sql("""
         SELECT table_name, column_name, data_type from information_schema.columns
         WHERE (table_schema  = 'UpperSchema' and table_name = 'UpperSchemaUpperTable')
            OR (table_schema  = 'public' and table_name = 'UpperTablePublic')
