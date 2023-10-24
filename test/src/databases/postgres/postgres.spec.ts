@@ -100,11 +100,9 @@ describe('Postgres tests', () => {
   });
 
   it('quote to properly access mixes case schema name', async () => {
-    if (await oneExists(runtime, '"UpperSchema"."UpperSchemaUpperTable"')) {
-      await expect(`
+    await expect(`
         run: postgres.table('UpperSchema.UpperSchemaUpperTable') -> { select: one }
       `).malloyResultMatches(runtime, {one: 1});
-    }
   });
 
   it('passes unsupported data', async () => {

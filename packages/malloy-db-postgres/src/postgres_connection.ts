@@ -46,6 +46,7 @@ import {
 import {Client, Pool, PoolClient} from 'pg';
 import QueryStream from 'pg-query-stream';
 import {randomUUID} from 'crypto';
+import {inspect} from 'util';
 
 interface PostgresQueryConfiguration {
   rowLimit?: number;
@@ -255,6 +256,11 @@ export class PostgresConnection
     return structDef;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  p(x: any): string {
+    return inspect(x, {breakLength: 72, depth: Infinity});
+  }
+
   private async schemaFromQuery(
     infoQuery: string,
     structDef: StructDef
@@ -265,6 +271,8 @@ export class PostgresConnection
       0,
       false
     );
+    // eslint-disable-next-line no-console
+    console.log(`SCHEMA FOR ${infoQuery}\n${this.p(result)}`);
     for (const row of result.rows) {
       const postgresDataType = row['data_type'] as string;
       let s = structDef;
