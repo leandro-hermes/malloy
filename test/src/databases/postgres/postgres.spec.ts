@@ -23,7 +23,6 @@
 
 /* eslint-disable no-console */
 
-import {ok} from 'assert';
 import {RuntimeList} from '../../runtimes';
 import {Runtime} from '@malloydata/malloy';
 import {describeIfDatabaseAvailable} from '../../util';
