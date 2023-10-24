@@ -45,14 +45,26 @@ describe('Postgres tests', () => {
     console.log(
       `CREATE SCHEMA RETURNED: ${JSON.stringify(createSchema, undefined, 2)}`
     );
-    await Promise.all([
-      runtime.connection.runSQL(
-        'create table if not exists "UpperSchema"."UpperSchemaUpperTable" as select 1 as one;'
-      ),
-      runtime.connection.runSQL(
-        'create table if not exists "UpperTablePublic" as select 1 as one;'
-      ),
-    ]);
+    const create1 = await runtime.connection.runSQL(
+      'create table if not exists "UpperSchema"."UpperSchemaUpperTable" as select 1 as one;'
+    );
+    console.log(
+      `CREATE "UpperSchema"."UpperSchemaUpperTable" RETURNED: ${JSON.stringify(
+        create1,
+        undefined,
+        2
+      )}`
+    );
+    const create2 = await runtime.connection.runSQL(
+      'create table if not exists "UpperTablePublic" as select 1 as one;'
+    );
+    console.log(
+      `CREATE "UpperTablePublic" RETURNED: ${JSON.stringify(
+        create2,
+        undefined,
+        2
+      )}`
+    );
   });
 
   afterAll(async () => {
