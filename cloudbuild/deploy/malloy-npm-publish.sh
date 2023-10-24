@@ -11,7 +11,7 @@ nix-shell --pure --keep NPM_TOKEN --keep PACKAGES --command "$(cat <<NIXCMD
   cd /workspace
   git branch -m main
   npm --no-audit --no-fund ci --loglevel error
-  npm npm run build
+  npm run build
   echo ----------- RUNNING POSTGRES TEST ---------------
   npx jest '/Users/mtoy/msrc/malloy/test/src/databases/postgres/postgres.spec.ts'
   # echo Publishing \$PACKAGES

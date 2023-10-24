@@ -56,7 +56,7 @@ describe('Postgres tests', () => {
     await runtimeList.closeAll();
   });
 
-  it('UpperSchema and UpperTablePublic exist', async () => {
+  it('UpperSchema and UpperTablePublic have been created properly', async () => {
     await expect(`
       run: postgres.sql("""
         select table_schema, table_name from information_schema.tables
@@ -66,6 +66,25 @@ describe('Postgres tests', () => {
     `).malloyResultMatches(runtime, [
       {table_schema: 'UpperSchema', table_name: 'UpperSchemaUpperTable'},
       {table_schema: 'public', table_name: 'UpperTablePublic'},
+    ]);
+    await expect(`
+      run: posgres.sql("""
+        SELECT table_name, column_name, data_type from information_schema.columns
+        WHERE (table_schema  = 'UpperSchema' and table_name = 'UpperSchemaUpperTable')
+           OR (table_schema  = 'public' and table_name = 'UpperTablePublic')
+        ORDER BY 1
+      """)
+    `).malloyResultMatches(runtime, [
+      {
+        table_name: 'UpperSchemaUpperTable',
+        column_name: 'one',
+        data_type: 'integer',
+      },
+      {
+        table_name: 'UpperTablePublic',
+        column_name: 'one',
+        data_type: 'integer',
+      },
     ]);
   });
 
