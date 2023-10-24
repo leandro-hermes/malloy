@@ -80,18 +80,20 @@ describe('Postgres tests', () => {
   `).malloyResultMatches(runtime, {select: 1, create: 2});
   });
 
-  async function okToRun(runtime: Runtime): Promise<boolean> {
-    const lookForOne = await runtime
-      .loadQuery(
-        'run: postgres.sql(\'SELECT one FROM public."UpperTablePublic"\')'
-      )
-      .run();
-    const one = lookForOne.data.path(0, 'one').value;
-    return one === 1;
+  async function oneExists(rt: Runtime, tn: string): Promise<boolean> {
+    try {
+      const lookForOne = await rt
+        .loadQuery(`run: postgres.sql('SELECT one FROM ${tn}')`)
+        .run();
+      const one = lookForOne.data.path(0, 'one').value;
+      return one === 1;
+    } catch (e) {
+      return false;
+    }
   }
 
   it('will quote to properly access mixed case table name', async () => {
-    if (await okToRun(runtime)) {
+    if (await oneExists(runtime, 'public."UpperTablePublic"')) {
       await expect(`
         run: postgres.table('public.UpperTablePublic') -> { select: one }
       `).malloyResultMatches(runtime, {one: 1});
@@ -99,7 +101,7 @@ describe('Postgres tests', () => {
   });
 
   it('quote to properly access mixes case schema name', async () => {
-    if (await okToRun(runtime)) {
+    if (await oneExists(runtime, '"UpperSchema"."UpperSchemaUpperTable"')) {
       await expect(`
         run: postgres.table('UpperSchema.UpperSchemaUpperTable') -> { select: one }
       `).malloyResultMatches(runtime, {one: 1});
