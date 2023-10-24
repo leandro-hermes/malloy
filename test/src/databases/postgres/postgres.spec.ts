@@ -56,6 +56,19 @@ describe('Postgres tests', () => {
     await runtimeList.closeAll();
   });
 
+  it('UpperSchema and UpperTablePublic exist', async () => {
+    await expect(`
+      run: postgres.sql("""
+        select table_schema, table_name from information_schema.tables
+        where table_name like 'Upper%Table%'
+        order by 1, 2
+      """)
+    `).malloyResultMatches(runtime, [
+      {table_schema: 'UpperSchema', table_name: 'UpperSchemaUpperTable'},
+      {table_schema: 'public', table_name: 'UpperTablePublic'},
+    ]);
+  });
+
   it('run an sql query', async () => {
     await expect(
       'run: postgres.sql("SELECT 1 as n") -> { select: n }'

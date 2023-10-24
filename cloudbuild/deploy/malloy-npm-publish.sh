@@ -11,14 +11,16 @@ nix-shell --pure --keep NPM_TOKEN --keep PACKAGES --command "$(cat <<NIXCMD
   cd /workspace
   git branch -m main
   npm --no-audit --no-fund ci --loglevel error
-  npm run lint && npm run build && npm run build-duckdb-db && npm run test-silent
-  echo Publishing \$PACKAGES
-  PRERELEASE=\$(date +%y%m%d%H%M%S)
-  VERSION=\$(jq -r .version ./lerna.json)-dev\$PRERELEASE
-  npx lerna version \$VERSION --yes --no-push --no-git-tag-version
-  for package in \$PACKAGES; do
-    echo Publishing \$package \$VERSION
-    npm publish -w \$package --access=public --tag next
-  done
+  npm npm run build
+  echo ----------- RUNNING POSTGRES TEST ---------------
+  npx jest '/Users/mtoy/msrc/malloy/test/src/databases/postgres/postgres.spec.ts'
+  # echo Publishing \$PACKAGES
+  # PRERELEASE=\$(date +%y%m%d%H%M%S)
+  # VERSION=\$(jq -r .version ./lerna.json)-dev\$PRERELEASE
+  # npx lerna version \$VERSION --yes --no-push --no-git-tag-version
+  # for package in \$PACKAGES; do
+  #   echo Publishing \$package \$VERSION
+  #   npm publish -w \$package --access=public --tag next
+  # done
 NIXCMD
 )"
