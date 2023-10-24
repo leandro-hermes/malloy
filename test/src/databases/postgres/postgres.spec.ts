@@ -39,8 +39,11 @@ describe('Postgres tests', () => {
 
   // Idempotently create schema and tables with capital letters to use in tests.
   beforeAll(async () => {
-    await runtime.connection.runSQL(
+    const createSchema = await runtime.connection.runSQL(
       'create schema if not exists "UpperSchema";'
+    );
+    console.log(
+      `CREATE SCHEMA RETURNED: ${JSON.stringify(createSchema, undefined, 2)}`
     );
     await Promise.all([
       runtime.connection.runSQL(
