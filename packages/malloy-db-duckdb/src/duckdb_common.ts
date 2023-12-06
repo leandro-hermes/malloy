@@ -22,6 +22,7 @@
  */
 
 import {
+  BrowsableSourceConnection,
   FieldTypeDef,
   MalloyQueryData,
   NamedStructDefs,
@@ -100,6 +101,10 @@ export abstract class DuckDBCommon
 
   public canPersist(): this is PersistSQLResults {
     return true;
+  }
+
+  public browsableSource(): this is BrowsableSourceConnection {
+    return false;
   }
 
   protected abstract setup(): Promise<void>;

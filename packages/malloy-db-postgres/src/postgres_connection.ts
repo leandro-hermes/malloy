@@ -29,6 +29,7 @@
 
 import * as crypto from 'crypto';
 import {
+  BrowsableSourceConnection,
   Connection,
   MalloyQueryData,
   NamedStructDefs,
@@ -127,6 +128,10 @@ export class PostgresConnection
 
   public get supportsNesting(): boolean {
     return true;
+  }
+
+  public browsableSource(): this is BrowsableSourceConnection {
+    return false;
   }
 
   public async fetchSchemaForTables(

@@ -131,6 +131,7 @@ export type {
   DataArrayOrRecord,
   Loggable,
   ModelMaterializer,
+  DocumentTablePath,
   DocumentSymbol,
   DocumentHighlight,
   ResultJSON,
@@ -142,6 +143,7 @@ export type {
 } from './malloy';
 export type {RunSQLOptions} from './run_sql_options';
 export type {
+  BrowsableSourceConnection,
   Connection,
   ConnectionConfig,
   ConnectionFactory,
