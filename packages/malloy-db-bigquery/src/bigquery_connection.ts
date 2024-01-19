@@ -35,7 +35,6 @@ import {ResourceStream} from '@google-cloud/paginator';
 import * as googleCommon from '@google-cloud/common';
 import {GaxiosError} from 'gaxios';
 import {
-  BrowsableSourceConnection,
   Connection,
   FieldTypeDef,
   Malloy,
@@ -136,11 +135,7 @@ const TIMEOUT_MS = 1000 * 60 * 10;
 
 // manage access to BQ, control costs, enforce global data/API limits
 export class BigQueryConnection
-  implements
-    Connection,
-    PersistSQLResults,
-    StreamingConnection,
-    BrowsableSourceConnection
+  implements Connection, PersistSQLResults, StreamingConnection
 {
   private readonly dialect = new StandardSQLDialect();
   static DEFAULT_QUERY_OPTIONS: BigQueryQueryOptions = {
@@ -229,10 +224,6 @@ export class BigQueryConnection
   }
 
   public get supportsNesting(): boolean {
-    return true;
-  }
-
-  public browsableSource(): this is BrowsableSourceConnection {
     return true;
   }
 
