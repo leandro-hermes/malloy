@@ -38,9 +38,8 @@ import {
   HasID,
   getStringParts,
   getShortString,
-  getStringIfShort,
-  unIndent,
   idToStr,
+  getPlainString,
 } from './parse-utils';
 import {CastType} from '../model';
 import {
@@ -253,26 +252,14 @@ export class MalloyToAST
     return new ast.Filter([el]);
   }
 
-  protected getPlainString(cx: HasString): string {
-    const shortStr = getStringIfShort(cx);
-    if (shortStr) {
-      return shortStr;
-    }
-    const safeParts: string[] = [];
-    const multiLineStr = cx.string().sqlString();
-    if (multiLineStr) {
-      for (const part of getStringParts(multiLineStr)) {
-        if (part instanceof ParserRuleContext) {
-          this.contextError(part, '%{ query } illegal in this string');
-        } else {
-          safeParts.push(part);
-        }
+  protected getPlainStringFrom(cx: HasString): string {
+    const [result, errors] = getPlainString(cx);
+    for (const error of errors) {
+      if (error instanceof ParserRuleContext) {
+        this.contextError(error, '%{ query } illegal in this string');
       }
-      unIndent(safeParts);
-      return safeParts.join('');
     }
-    // string: shortString | sqlString; So this will never happen
-    return '';
+    return result || '';
   }
 
   protected makeSqlString(
@@ -438,7 +425,7 @@ export class MalloyToAST
   }
 
   visitTableFunction(pcx: parse.TableFunctionContext): ast.TableSource {
-    const tableURI = this.getPlainString(pcx.tableURI());
+    const tableURI = this.getPlainStringFrom(pcx.tableURI());
     const el = this.astAt(new ast.TableFunctionSource(tableURI), pcx);
     this.m4advisory(
       pcx,
@@ -450,7 +437,7 @@ export class MalloyToAST
   visitTableMethod(pcx: parse.TableMethodContext): ast.TableSource {
     const connId = pcx.connectionId();
     const connectionName = this.astAt(this.getModelEntryName(connId), connId);
-    const tablePath = this.getPlainString(pcx.tablePath());
+    const tablePath = this.getPlainStringFrom(pcx.tablePath());
     return this.astAt(
       new ast.TableMethodSource(connectionName, tablePath),
       pcx
@@ -754,7 +741,7 @@ export class MalloyToAST
   visitTimezoneStatement(
     cx: parse.TimezoneStatementContext
   ): ast.TimezoneStatement {
-    const timezone = this.getPlainString(cx);
+    const timezone = this.getPlainStringFrom(cx);
     const timezoneStatement = this.astAt(
       new ast.TimezoneStatement(timezone),
       cx.string()
@@ -1248,7 +1235,7 @@ export class MalloyToAST
   }
 
   visitExprString(pcx: parse.ExprStringContext): ast.ExprString {
-    const str = this.getPlainString(pcx);
+    const str = this.getPlainStringFrom(pcx);
     return new ast.ExprString(str);
   }
 
@@ -1469,7 +1456,7 @@ export class MalloyToAST
     }
     const rtcx = pcx.string();
     if (rtcx) {
-      return {raw: this.getPlainString({string: () => rtcx})};
+      return {raw: this.getPlainStringFrom({string: () => rtcx})};
     }
     throw this.internalError(
       pcx,
@@ -1611,7 +1598,7 @@ export class MalloyToAST
   }
 
   visitImportStatement(pcx: parse.ImportStatementContext): ast.ImportStatement {
-    const url = this.getPlainString(pcx.importURL());
+    const url = this.getPlainStringFrom(pcx.importURL());
     const importStmt = this.astAt(
       new ast.ImportStatement(url, this.parseInfo.importBaseURL),
       pcx
@@ -1648,7 +1635,7 @@ export class MalloyToAST
         if (connectionName) {
           this.contextError(nmCx, 'Cannot redefine connection');
         } else {
-          connectionName = this.getPlainString(nmCx);
+          connectionName = this.getPlainStringFrom(nmCx);
         }
       }
       const selCx = blockEnt.sqlString();
